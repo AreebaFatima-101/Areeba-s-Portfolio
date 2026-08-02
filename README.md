@@ -20,8 +20,7 @@ in AI/ML, software development, and software quality assurance.
 - Working contact form that sends email via the Node backend
 - Downloadable resume
 
-## Running Locally
-
+**Deployed**
 **Frontend**
 \`\`\`bash
 cd client
