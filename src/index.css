@@ -1,0 +1,863 @@
+/* ===== Icon-based contact/social links ===== */
+html {
+  scroll-behavior: smooth;
+}
+.icon-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  color: var(--accent-light);
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.icon-link:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  background: var(--bg-alt);
+}
+
+/* ===== Scroll progress bar ===== */
+.scroll-progress-track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 100;
+  background: transparent;
+}
+
+.scroll-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  transition: width 0.1s ease-out;
+}
+
+/* ===== Hero entrance animation =====
+   Kept subtle and one-shot (fades in once on load, then stays put) -
+   no looping motion, matching the calmer reference direction. */
+.hero-fade {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeIn 0.6s ease forwards;
+}
+
+@keyframes heroFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-gradient-text {
+  background: linear-gradient(90deg, var(--text), var(--accent-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: heroFadeIn 0.6s ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade { animation: none; opacity: 1; transform: none; }
+  .hero-gradient-text { animation: none; }
+}
+
+/* ===== Design tokens =====
+   Keeping all colors/fonts as variables here means if Areeba wants
+   to re-theme the whole site later, she only edits this one block. */
+:root {
+  --bg: #0a0f2c;
+  --bg-alt: #25195b;
+  --accent: #463a8d;
+  --accent-light: #e6e6e6;
+  --text: #dcd8ee;
+  --muted: #eff0ff;
+  --border: #6475e2;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --max-width: 1100px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== Starfield background =====
+   Replaces the earlier blob background to match the space theme.
+   Stars are positioned/generated in AnimatedBackground.jsx; this just
+   styles each dot and gives it a slow independent twinkle. */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at top, #7050f1 0%, var(--bg) 60%);
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffffff;
+  animation: twinkle ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star { animation: none; opacity: 0.6; }
+}
+
+/* ===== Scroll reveal =====
+   Elements start slightly lower and transparent, then animate to
+   normal position/opacity once useScrollReveal's IntersectionObserver
+   adds "in-view". transitionDelay (set inline per item) staggers cards. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: 100px 0;
+}
+
+.section-alt {
+  background: var(--bg-alt);
+}
+
+.eyebrow {
+  color: var(--accent-light);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin-bottom: 40px;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(15, 3, 74, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 76px;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--accent-light);
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  position: relative;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: color 0.15s ease;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 1px;
+  background: var(--accent-light);
+  transition: width 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  color: var(--accent-light);
+}
+
+.nav-links a:hover::after,
+.nav-links a:focus-visible::after {
+  width: 100%;
+}
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 100px 24px 60px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero-content {
+  text-align: left;
+  max-width: 640px;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  margin-bottom: 12px;
+}
+
+.hero .role {
+  color: var(--accent-light);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  margin-bottom: 16px;
+}
+
+.blink-cursor {
+  animation: blink 1s step-end infinite;
+  color: var(--accent);
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.hero .tagline {
+  max-width: 560px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.hero .quote {
+  font-style: italic;
+  color: var(--accent-light);
+  margin-bottom: 32px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ===== Avatar badge (initials placeholder + GPA pill) ===== */
+.avatar-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.avatar-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent-light);
+}
+
+.gpa-pill {
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* ===== Planet graphic =====
+   Pure CSS - radial-gradient sphere + a rotated elliptical ring made
+   from a border. No image assets required. */
+.planet-wrap {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planet-sphere {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--accent-light), var(--accent) 55%, #0d0734 100%);
+  box-shadow: 0 0 60px rgba(176, 172, 203, 0.35);
+  position: relative;
+  z-index: 2;
+}
+
+.planet-ring {
+  position: absolute;
+  width: 280px;
+  height: 90px;
+  border: 2px solid var(--accent-light);
+  border-radius: 50%;
+  opacity: 0.5;
+  transform: rotate(-20deg);
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding-top: 60px;
+  }
+  .hero-content {
+    text-align: center;
+  }
+  .avatar-badge {
+    justify-content: center;
+  }
+  .hero-buttons {
+    justify-content: center;
+  }
+  .hero-stats {
+    justify-content: center;
+  }
+  .hero-stat {
+    align-items: center;
+  }
+  .planet-wrap {
+    width: 200px;
+    height: 200px;
+  }
+  .planet-sphere {
+    width: 200px;
+    height: 200px;
+  }
+  .planet-ring {
+    width: 180px;
+    height: 56px;
+  }
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(201, 199, 214, 0.35);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #d9d6f2;
+}
+
+.btn-primary:hover {
+  background: var(--accent-light);
+}
+
+.btn-outline {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-light);
+  color: var(--accent-light);
+}
+
+/* ===== About ===== */
+.about-text {
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.about-meta {
+  display: flex;
+  gap: 40px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.about-meta div span:first-child {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--accent-light);
+}
+
+.about-meta div span:last-child {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ===== Orbit skills sphere =====
+   .orbit-group physically rotates 360deg forever (orbitSpin). Each
+   .orbit-item is placed at a fixed angle+radius via inline transform
+   (set in Skills.jsx), so as the group spins, every item travels in
+   a circle around the center - that's the "revolving" part.
+   Each .orbit-icon inside then runs counterSpin, an equal and
+   opposite rotation using the --start-angle custom property set
+   inline per-icon, which cancels the group's spin so the icon itself
+   never looks upside-down while it orbits. */
+.orbit-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit-sphere {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--bg-alt), var(--bg) 70%);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 50px rgba(133, 31, 223, 0.15) inset;
+}
+
+.orbit-group {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  animation: orbitSpin 30s linear infinite;
+}
+
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.orbit-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.orbit-icon {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-light);
+  animation: counterSpin 30s linear infinite;
+  transition: transform 0.2s ease;
+}
+.orbit-logo-img {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+}
+.orbit-icon:hover {
+  transform: scale(1.15);
+}
+
+@keyframes counterSpin {
+  from { transform: rotate(var(--start-angle)); }
+  to { transform: rotate(calc(var(--start-angle) - 360deg)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-group, .orbit-icon { animation: none; }
+}
+
+/* ===== Hero stats bar ===== */
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  justify-content: flex-start;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hero-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent-light);
+}
+
+.hero-stat-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ===== Availability badge ===== */
+.availability-badge {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  color: var(--accent-light);
+  margin-bottom: 20px;
+}
+
+/* ===== Skills ===== */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.skill-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.skill-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.skill-card h3 {
+  color: var(--accent-light);
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+/* ===== Projects ===== */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+}
+
+.project-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+}
+
+.project-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.project-links a {
+  font-size: 0.85rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent-light);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.project-links a:hover {
+  border-color: var(--accent-light);
+}
+
+.project-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.project-stack {
+  color: var(--accent-light);
+  font-size: 0.85rem;
+  font-family: var(--font-display);
+  margin-bottom: 16px;
+}
+
+.project-card ul {
+  color: var(--muted);
+  font-size: 0.92rem;
+  padding-left: 18px;
+  flex-grow: 1;
+}
+
+.project-card li {
+  margin-bottom: 6px;
+}
+
+/* ===== Experience ===== */
+.experience-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+}
+
+.experience-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.experience-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.experience-card h3 {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.experience-card h4 {
+  color: var(--accent-light);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.experience-card .date {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-bottom: 14px;
+}
+
+.experience-card ul {
+  color: var(--muted);
+  font-size: 0.92rem;
+  padding-left: 18px;
+}
+
+.experience-card li {
+  margin-bottom: 6px;
+}
+
+/* ===== Certifications ===== */
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.cert-item {
+  border-left: 2px solid var(--accent);
+  padding: 8px 0 8px 16px;
+}
+
+.cert-item h4 {
+  font-size: 0.98rem;
+  margin-bottom: 2px;
+}
+
+.cert-item span {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ===== Contact ===== */
+.contact-form {
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-status {
+  font-size: 0.9rem;
+}
+
+.form-status.success { color: #7ee787; }
+.form-status.error { color: #ff7b72; }
+
+.contact-links {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.contact-links a {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+  border-bottom: 1px solid transparent;
+}
+
+.contact-links a:hover {
+  border-color: var(--accent-light);
+}
+
+/* ===== Footer ===== */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 720px) {
+  .nav-links {
+    position: absolute;
+    top: 76px;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    flex-direction: column;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+  .nav-links.open {
+    display: flex;
+  }
+  .nav-toggle {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
